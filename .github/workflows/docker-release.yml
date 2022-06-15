@@ -9,7 +9,7 @@ on:
       PRERELEASE:
         description: 'Whether this is a prerelease'
         type: boolean
-        required: false
+        required: true
 
   release:
     types: [published]
@@ -20,7 +20,7 @@ permissions:
 
 env:
   TAG_NAME: ${{ github.event.inputs.TAG_NAME || github.event.release.tag_name }}
-  IS_PRERELEASE: ${{ github.event.release.prerelease == true || github.event.inputs.PRERELEASE }}
+  IS_PRERELEASE: ${{ github.event.release.prerelease || github.event.inputs.PRERELEASE }}
 
 jobs:
 # ===============================================================
@@ -67,7 +67,7 @@ jobs:
         rm releases/*.tar.gz
 
     - name: Build release image
-      if: env.IS_PRERELEASE == 'false'
+      if: "!env.IS_PRERELEASE"
       uses: docker/build-push-action@v3
       with:
         context: .
